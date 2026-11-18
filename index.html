@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>迷路ゲーム</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="game">
+      <h1>迷路ゲーム</h1>
+
+      <div class="status-bar">
+        <p>残り時間: <span id="timer">60</span>秒</p>
+        <button id="restart-button" type="button">やり直す</button>
+      </div>
+
+      <div
+        id="maze"
+        class="maze"
+        role="application"
+        aria-label="迷路ゲーム。矢印キーで移動してください"
+      ></div>
+
+      <div id="result" class="result" hidden>
+        <div class="result-panel" role="dialog" aria-modal="true" aria-labelledby="result-title">
+          <p id="result-title" class="result-title"></p>
+          <button id="result-restart-button" type="button">もう一度プレイ</button>
+        </div>
+      </div>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
