@@ -74,6 +74,7 @@ let gameFinished = false;
 function createMaze() {
   mazeLayout = generateMaze(mazeRows, mazeColumns);
   mazeElement.style.setProperty("--columns", mazeLayout[0].length);
+  mazeElement.style.setProperty("--rows", mazeLayout.length);
   mazeElement.replaceChildren();
 
   mazeLayout.forEach((row, rowIndex) => {
