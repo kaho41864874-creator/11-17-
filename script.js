@@ -81,6 +81,44 @@ let avatarPosition = { ...startPosition };
 let remainingTime = timeLimit;
 let timerId = null;
 let gameFinished = false;
+let audioContext = null;
+
+function enableAudio() {
+  if (!window.AudioContext) {
+    return;
+  }
+
+  audioContext ??= new window.AudioContext();
+
+  if (audioContext.state === "suspended") {
+    void audioContext.resume();
+  }
+}
+
+function playSound(notes) {
+  if (!audioContext) {
+    return;
+  }
+
+  const startTime = audioContext.currentTime;
+
+  notes.forEach(({ frequency, duration, delay = 0, type = "sine" }) => {
+    const oscillator = audioContext.createOscillator();
+    const volume = audioContext.createGain();
+    const noteStart = startTime + delay;
+    const noteEnd = noteStart + duration;
+
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, noteStart);
+    volume.gain.setValueAtTime(0.001, noteStart);
+    volume.gain.exponentialRampToValueAtTime(0.08, noteStart + 0.01);
+    volume.gain.exponentialRampToValueAtTime(0.001, noteEnd);
+    oscillator.connect(volume);
+    volume.connect(audioContext.destination);
+    oscillator.start(noteStart);
+    oscillator.stop(noteEnd);
+  });
+}
 
 function createMaze() {
   mazeLayout = generateMaze(mazeRows, mazeColumns);
@@ -134,6 +172,7 @@ function moveAvatar(rowOffset, columnOffset) {
   const nextCell = getCell(nextRow, nextColumn);
 
   if (!nextCell || nextCell.classList.contains("wall")) {
+    playSound([{ frequency: 150, duration: 0.12, type: "triangle" }]);
     return;
   }
 
@@ -142,12 +181,27 @@ function moveAvatar(rowOffset, columnOffset) {
 
   if (nextRow === goalPosition.row && nextColumn === goalPosition.column) {
     finishGame(true);
+  } else {
+    playSound([{ frequency: 440, duration: 0.07, type: "triangle" }]);
   }
 }
 
 function finishGame(isCleared) {
   gameFinished = true;
   window.clearInterval(timerId);
+  playSound(
+    isCleared
+      ? [
+          { frequency: 523, duration: 0.16 },
+          { frequency: 659, duration: 0.16, delay: 0.14 },
+          { frequency: 784, duration: 0.3, delay: 0.28 },
+        ]
+      : [
+          { frequency: 330, duration: 0.2 },
+          { frequency: 247, duration: 0.2, delay: 0.18 },
+          { frequency: 165, duration: 0.35, delay: 0.36 },
+        ],
+  );
   resultTitle.textContent = isCleared ? "クリア！" : "タイムアップ";
   resultElement.hidden = false;
   resultRestartButton.focus();
@@ -186,6 +240,9 @@ function handleKeydown(event) {
   }
 
   event.preventDefault();
+  if (!gameFinished) {
+    enableAudio();
+  }
   moveAvatar(...moves[event.key]);
 }
 
