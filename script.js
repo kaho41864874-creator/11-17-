@@ -30,19 +30,10 @@ function generateMaze(rows, columns) {
     return seed % length;
   }
 
-  function shuffle(items) {
-    for (let index = items.length - 1; index > 0; index -= 1) {
-      const target = randomIndex(index + 1);
-      [items[index], items[target]] = [items[target], items[index]];
-    }
-  }
+  const frontier = [];
 
-  function carve(row, column) {
-    maze[row][column] = ".";
-    const nextDirections = [...directions];
-    shuffle(nextDirections);
-
-    nextDirections.forEach(([rowOffset, columnOffset]) => {
+  function addFrontier(row, column) {
+    directions.forEach(([rowOffset, columnOffset]) => {
       const nextRow = row + rowOffset;
       const nextColumn = column + columnOffset;
 
@@ -53,13 +44,33 @@ function generateMaze(rows, columns) {
         nextColumn < columns - 1 &&
         maze[nextRow][nextColumn] === "#"
       ) {
-        maze[row + rowOffset / 2][column + columnOffset / 2] = ".";
-        carve(nextRow, nextColumn);
+        frontier.push({
+          row: nextRow,
+          column: nextColumn,
+          previousRow: row,
+          previousColumn: column,
+        });
       }
     });
   }
 
-  carve(1, 1);
+  maze[1][1] = ".";
+  addFrontier(1, 1);
+
+  while (frontier.length > 0) {
+    const [next] = frontier.splice(randomIndex(frontier.length), 1);
+
+    if (maze[next.row][next.column] !== "#") {
+      continue;
+    }
+
+    maze[(next.row + next.previousRow) / 2][
+      (next.column + next.previousColumn) / 2
+    ] = ".";
+    maze[next.row][next.column] = ".";
+    addFrontier(next.row, next.column);
+  }
+
   maze[startPosition.row][startPosition.column] = "S";
   maze[goalPosition.row][goalPosition.column] = "G";
 
