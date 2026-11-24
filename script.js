@@ -8,11 +8,11 @@ const resultRestartButton = document.getElementById("result-restart-button");
 const bgmToggleButton = document.getElementById("bgm-toggle-button");
 const bgmVolumeInput = document.getElementById("bgm-volume");
 
-const mazeRows = 31;
-const mazeColumns = 41;
+const mazeRows = 51;
+const mazeColumns = 71;
 const startPosition = { row: 1, column: 1 };
 const goalPosition = { row: mazeRows - 2, column: mazeColumns - 2 };
-const timeLimit = 120;
+const timeLimit = 75;
 
 let mazeLayout = [];
 
@@ -26,7 +26,7 @@ function generateMaze(rows, columns) {
     [0, -2],
     [0, 2],
   ];
-  let seed = 20261118;
+  let seed = 20261124;
 
   function randomIndex(length) {
     seed = (seed * 1664525 + 1013904223) >>> 0;
