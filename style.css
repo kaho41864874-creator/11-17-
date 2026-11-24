@@ -86,10 +86,14 @@ button:hover {
   grid-template-columns: repeat(var(--columns), 1fr);
   aspect-ratio: var(--columns) / var(--rows);
   overflow: hidden;
-  border: 4px solid #172033;
+  border: 4px solid transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(135deg, #ef476f, #ff9f1c, #ffe66d, #06d6a0, #118ab2, #8b5cf6) border-box;
   border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 12px 30px rgb(23 32 51 / 18%);
+  box-shadow:
+    0 12px 30px rgb(23 32 51 / 18%),
+    0 0 18px rgb(139 92 246 / 35%);
 }
 
 .cell {
@@ -98,7 +102,9 @@ button:hover {
 }
 
 .wall {
-  background: #172033;
+  background: linear-gradient(135deg, #ef476f 0 25%, #ff9f1c 25% 50%, #06d6a0 50% 75%, #118ab2 75%);
+  background-size: 6px 6px;
+  box-shadow: inset 0 0 2px rgb(255 255 255 / 35%);
 }
 
 .path {
