@@ -1,9 +1,12 @@
 const mazeElement = document.getElementById("maze");
 const timerElement = document.getElementById("timer");
+const startButton = document.getElementById("start-button");
 const restartButton = document.getElementById("restart-button");
 const resultElement = document.getElementById("result");
 const resultTitle = document.getElementById("result-title");
 const resultRestartButton = document.getElementById("result-restart-button");
+const bgmToggleButton = document.getElementById("bgm-toggle-button");
+const bgmVolumeInput = document.getElementById("bgm-volume");
 
 const mazeRows = 31;
 const mazeColumns = 41;
@@ -81,7 +84,13 @@ let avatarPosition = { ...startPosition };
 let remainingTime = timeLimit;
 let timerId = null;
 let gameFinished = false;
+let gameStarted = false;
 let audioContext = null;
+let bgmGain = null;
+let bgmTimerId = null;
+let bgmStep = 0;
+let bgmStopped = false;
+const bgmOscillators = new Set();
 
 function enableAudio() {
   if (!window.AudioContext) {
@@ -89,9 +98,76 @@ function enableAudio() {
   }
 
   audioContext ??= new window.AudioContext();
+  bgmGain ??= audioContext.createGain();
+  bgmGain.gain.setValueAtTime(
+    Number(bgmVolumeInput.value) / 100,
+    audioContext.currentTime,
+  );
+  bgmGain.connect(audioContext.destination);
 
   if (audioContext.state === "suspended") {
     void audioContext.resume();
+  }
+}
+
+function playBgmNote() {
+  if (!audioContext || !bgmGain || bgmStopped) {
+    return;
+  }
+
+  const melody = [261.63, 329.63, 392, 329.63, 293.66, 349.23, 440, 349.23];
+  const startTime = audioContext.currentTime;
+  const oscillator = audioContext.createOscillator();
+  const noteGain = audioContext.createGain();
+
+  oscillator.type = "triangle";
+  oscillator.frequency.setValueAtTime(melody[bgmStep % melody.length], startTime);
+  noteGain.gain.setValueAtTime(0.001, startTime);
+  noteGain.gain.exponentialRampToValueAtTime(0.18, startTime + 0.02);
+  noteGain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.38);
+
+  oscillator.connect(noteGain);
+  noteGain.connect(bgmGain);
+  bgmOscillators.add(oscillator);
+  oscillator.onended = () => bgmOscillators.delete(oscillator);
+  oscillator.start(startTime);
+  oscillator.stop(startTime + 0.4);
+  bgmStep += 1;
+}
+
+function startBgm() {
+  enableAudio();
+  if (!audioContext || !bgmGain) {
+    return;
+  }
+
+  window.clearInterval(bgmTimerId);
+  bgmStopped = false;
+  bgmToggleButton.textContent = "BGMを停止";
+  playBgmNote();
+  bgmTimerId = window.setInterval(playBgmNote, 400);
+}
+
+function stopBgm() {
+  window.clearInterval(bgmTimerId);
+  bgmStopped = true;
+
+  bgmOscillators.forEach((oscillator) => {
+    try {
+      oscillator.stop();
+    } catch {
+      // The oscillator may already have ended.
+    }
+  });
+  bgmOscillators.clear();
+  bgmToggleButton.textContent = "BGMを再生";
+}
+
+function toggleBgm() {
+  if (bgmStopped) {
+    startBgm();
+  } else {
+    stopBgm();
   }
 }
 
@@ -163,7 +239,7 @@ function renderAvatar() {
 }
 
 function moveAvatar(rowOffset, columnOffset) {
-  if (gameFinished) {
+  if (!gameStarted || gameFinished) {
     return;
   }
 
@@ -220,11 +296,15 @@ function startGame() {
   window.clearInterval(timerId);
   avatarPosition = { ...startPosition };
   remainingTime = timeLimit;
+  gameStarted = true;
   gameFinished = false;
   resultElement.hidden = true;
   timerElement.textContent = remainingTime;
   renderAvatar();
   timerId = window.setInterval(updateTimer, 1000);
+  if (!bgmStopped) {
+    startBgm();
+  }
 }
 
 function handleKeydown(event) {
@@ -247,8 +327,19 @@ function handleKeydown(event) {
 }
 
 document.addEventListener("keydown", handleKeydown);
+startButton.addEventListener("click", startGame);
 restartButton.addEventListener("click", startGame);
 resultRestartButton.addEventListener("click", startGame);
+bgmToggleButton.addEventListener("click", toggleBgm);
+bgmVolumeInput.addEventListener("input", () => {
+  if (audioContext && bgmGain) {
+    bgmGain.gain.setTargetAtTime(
+      Number(bgmVolumeInput.value) / 100,
+      audioContext.currentTime,
+      0.02,
+    );
+  }
+});
 
 createMaze();
-startGame();
+renderAvatar();

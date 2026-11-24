@@ -11,8 +11,25 @@
       <h1>迷路ゲーム</h1>
 
       <div class="status-bar">
-        <p>残り時間: <span id="timer">60</span>秒</p>
-        <button id="restart-button" type="button">やり直す</button>
+        <p>残り時間: <span id="timer">120</span>秒</p>
+        <div class="game-buttons">
+          <button id="start-button" type="button">ゲーム開始</button>
+          <button id="restart-button" type="button">やり直す</button>
+        </div>
+      </div>
+
+      <div class="bgm-controls" aria-label="BGMコントロール">
+        <button id="bgm-toggle-button" type="button">BGMを停止</button>
+        <label for="bgm-volume">
+          音量
+          <input
+            id="bgm-volume"
+            type="range"
+            min="0"
+            max="100"
+            value="30"
+          />
+        </label>
       </div>
 
       <div
