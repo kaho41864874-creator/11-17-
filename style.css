@@ -90,7 +90,7 @@ button:hover {
   outline: 3px dotted #3567d4;
   outline-offset: 4px;
   border-radius: 8px;
-  background: #fff;
+  background: #000;
   box-shadow: 0 12px 30px rgb(23 32 51 / 18%);
 }
 
@@ -126,21 +126,21 @@ button:hover {
 }
 
 .path {
-  background: #fff;
+  background: #000;
 }
 
 .start {
-  background: #bdebd1;
+  background: #003b20;
 }
 
 .goal {
-  background: #ffd66b;
+  background: #7a6500;
 }
 
 .avatar {
   position: relative;
   z-index: 1;
-  background: #fff;
+  background: #000;
 }
 
 .avatar::after {
