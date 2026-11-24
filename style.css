@@ -130,11 +130,43 @@ button:hover {
 }
 
 .start {
-  background: #003b20;
+  position: relative;
+  z-index: 1;
+  background: #39ff14;
+  box-shadow:
+    inset 0 0 0 3px #fff,
+    0 0 12px #39ff14;
+}
+
+.start::after {
+  content: "S";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #172033;
+  font-size: clamp(0.35rem, 1.2vw, 0.8rem);
+  font-weight: 900;
 }
 
 .goal {
-  background: #7a6500;
+  position: relative;
+  z-index: 1;
+  background: #ff1744;
+  box-shadow:
+    inset 0 0 0 3px #fff,
+    0 0 12px #ff1744;
+}
+
+.goal::after {
+  content: "G";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: clamp(0.35rem, 1.2vw, 0.8rem);
+  font-weight: 900;
 }
 
 .avatar {
