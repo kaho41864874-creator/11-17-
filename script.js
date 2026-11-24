@@ -209,6 +209,9 @@ function createMaze() {
 
       if (symbol === "#") {
         cell.classList.add("wall");
+        const dotColors = ["neon-red", "neon-yellow", "neon-blue", "neon-green"];
+        const dotColor = dotColors[Math.floor(Math.random() * dotColors.length)];
+        cell.classList.add(dotColor);
       } else if (symbol === "S") {
         cell.classList.add("start");
       } else if (symbol === "G") {
