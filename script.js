@@ -12,7 +12,7 @@ const mazeRows = 51;
 const mazeColumns = 71;
 const startPosition = { row: 1, column: 1 };
 const goalPosition = { row: mazeRows - 2, column: mazeColumns - 2 };
-const timeLimit = 75;
+const timeLimit = 55;
 
 let mazeLayout = [];
 
